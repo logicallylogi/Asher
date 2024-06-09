@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Asher | Cybfi</title>
+    <script src="https://unpkg.com/compromise"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+    <style>
+        #message {
+            width: 35vw;
+            float: left;
+        }
+        #messages {
+            margin-bottom: 10vh;
+        }
+    </style>
+</head>
+<body>
+<table id="messages">
+    <thead>
+    </thead>
+    <tbody>
+    </tbody>
+</table>
+<form style="position:fixed;bottom:0;">
+    <input type="text" id="message" placeholder="Type a message here...">
+    <button type="submit" id="send" style="float:right;">Send</button>
+</form>
+<script>
+    let feeling;
+    let response_mode;
+
+    function respond(message) {
+        const messages = document.getElementById('messages')
+        messages.innerHTML += `<tr><td style="font-weight: bolder;">ASHER: ${message}</td></tr>`
+    }
+
+    function receive(messageElement) {
+        const messages = document.getElementById('messages')
+        const message = messageElement.value
+        messages.innerHTML += `<tr><td>USER: ${message}</td></tr>`
+        messageElement.value = ""
+        return message
+    }
+
+    function hive(message) {
+        message.debug()
+
+        if (message.has('#Noun #Verb #Adjective')) {
+            feeling = message.match('#Noun #Verb) [#Adjective]', 0).text()
+        } else if (message.has('#Possessive (name is|am) #FirstName') && !message.has('(his|her|their|xier|its) name is #FirstName')) {
+            respond("Hello " + message.match('[#FirstName]', 0).text() + ", how are you?")
+        } else if (message.has("(yes|yea|yeah|yep|yup")) {
+            if (response_mode === "suicidal") {
+                respond("I am sorry to hear that. I am here to help you. What can I do for you? Do you want coping skills?")
+            } else {
+                respond("What are you saying yes to?")
+            }
+        } else  if (message.has("#negative")) {
+            if (response_mode === "suicidal") {
+                respond("Okay, please steer me in the right direction. How are you feeling?")
+            } else {
+                respond("I'm not sure what you're saying no to, sorry.")
+            }
+        } else {
+            respond("I am sorry, I don't understand. Please try again.")
+        }
+
+        switch (feeling) {
+            case "suicidal":
+                response_mode = "suicidal"
+                respond("That means you are suicidal, yes?")
+                break;
+            case "depressed":
+                response_mode = "depression"
+                respond("That means you are depressed, yes?")
+                break;
+            default:
+                if (!feeling) {
+                    break;
+                }
+                respond("Why do you think you are " + feeling + "?")
+                break;
+        }
+        feeling = "";
+
+
+    }
+
+    document.getElementById('send').onclick = ((e) => {
+        e.preventDefault()
+        let message = document.getElementById('message')
+        hive(nlp(receive(message)))
+    })
+
+    respond("Hello, I am Asher. I am a chatbot that can help you with your mental health. What is your name?")
+</script>
+</body>
+</html>
